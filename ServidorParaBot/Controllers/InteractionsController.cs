@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace ServidorParaBot.Controllers
 {
@@ -7,10 +8,18 @@ namespace ServidorParaBot.Controllers
     public class InteractionsController : ControllerBase
     {
         [HttpPost]
-        public Interactions Post()
+        public ActionResult Post([FromHeader(Name = "X-Signature-Ed25519")] string? signature, [FromHeader(Name = "X-Signature-Timestamp")] string? timestamp)
         {
-            return new Interactions(1);
+            if (String.IsNullOrWhiteSpace(signature) || String.IsNullOrWhiteSpace(timestamp))
+            {
+                return Unauthorized();
+            }
+
+            return Ok(new Interactions(1));
+
         }
+
+        
 
     }
 
