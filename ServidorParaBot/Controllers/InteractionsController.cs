@@ -12,9 +12,20 @@ namespace ServidorParaBot.Controllers
     [Route("[controller]")]
     public class InteractionsController : ControllerBase
     {
+
+        private readonly ILogger<InteractionsController> _logger;
+
+        public InteractionsController(ILogger<InteractionsController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpPost]
         public async Task<ActionResult> Post([FromHeader(Name = "X-Signature-Ed25519")] string? signature, [FromHeader(Name = "X-Signature-Timestamp")] string? timestamp)
         {
+
+            _logger.LogInformation(timestamp);
+            _logger.LogInformation(signature); 
 
             if (String.IsNullOrWhiteSpace(signature) || String.IsNullOrWhiteSpace(timestamp))
             {
@@ -27,14 +38,15 @@ namespace ServidorParaBot.Controllers
             {
                 body = await reader.ReadToEndAsync();
 
+                _logger.LogInformation(body);
+
+
                 if (VerifySignature(Environment.GetEnvironmentVariable("PUBLIC_KEY"), timestamp + body, signature))
                 {
                     return Ok(new Interactions(1));
                 }
             }
-
             return Unauthorized();    
-
         }
 
         public bool VerifySignature(string publicKey, string dataToVerify, string signature)
