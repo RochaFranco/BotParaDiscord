@@ -5,6 +5,7 @@ using Org.BouncyCastle.Utilities.Encoders;
 using System.Net;
 using System.Security;
 using System.Text;
+using System.Text.Json;
 
 namespace ServidorParaBot.Controllers
 {
@@ -24,9 +25,6 @@ namespace ServidorParaBot.Controllers
         public async Task<ActionResult> Post([FromHeader(Name = "X-Signature-Ed25519")] string? signature, [FromHeader(Name = "X-Signature-Timestamp")] string? timestamp)
         {
 
-            _logger.LogInformation(timestamp);
-            _logger.LogInformation(signature); 
-
             if (String.IsNullOrWhiteSpace(signature) || String.IsNullOrWhiteSpace(timestamp))
             {
                 return Unauthorized();
@@ -38,12 +36,26 @@ namespace ServidorParaBot.Controllers
             {
                 body = await reader.ReadToEndAsync();
 
-                _logger.LogInformation(body);
-
-
                 if (VerifySignature(Environment.GetEnvironmentVariable("PUBLIC_KEY"), timestamp + body, signature))
                 {
-                    return Ok(new Interactions(1));
+                    InteractionsRequest interaction = JsonSerializer.Deserialize<InteractionsRequest>(body);
+
+                    if (interaction.type ==  RequestTypesEnum.PING)
+                    {
+                        return Ok(new InteractionsResponse(ResponseTypesEnum.PONG));
+                    }
+
+                    if (interaction.type == RequestTypesEnum.APPLICATION_COMMAND)
+                    {
+                        if (interaction.data.name == "test")
+                        {
+                            return Ok(new InteractionsResponse("Mi primer test uwu"));
+                        }
+                    }
+
+
+
+                    return Ok();
                 }
             }
             return Unauthorized();    
@@ -62,6 +74,7 @@ namespace ServidorParaBot.Controllers
             return isVerified;
         }
 
+        
 
     }
 
