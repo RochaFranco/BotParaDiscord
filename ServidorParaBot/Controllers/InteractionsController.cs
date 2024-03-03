@@ -51,6 +51,11 @@ namespace ServidorParaBot.Controllers
                         {
                             return Ok(new InteractionsResponse("Mi primer test uwu"));
                         }
+
+                        if (interaction.data.name == "dolar")
+                        {
+                            return Ok(new InteractionsResponse("420.69"));
+                        }
                     }
 
 
