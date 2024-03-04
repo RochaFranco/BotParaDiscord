@@ -2,6 +2,7 @@
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Utilities.Encoders;
+using System;
 using System.Net;
 using System.Security;
 using System.Text;
@@ -54,7 +55,9 @@ namespace ServidorParaBot.Controllers
 
                         if (interaction.data.name == "dolar")
                         {
-                            return Ok(new InteractionsResponse("420.69"));
+                            var dolarBlue = await PrecioDolarBlue();
+                            var dolarOficial = await PrecioDolarOficial();
+                            return Ok(new InteractionsResponse(dolarBlue.ToString() + "\n" + dolarOficial.ToString()));
                         }
                     }
 
@@ -79,8 +82,89 @@ namespace ServidorParaBot.Controllers
             return isVerified;
         }
 
-        
+        public static async Task<DolarBlue> PrecioDolarBlue()
+        {
+            string url = "https://dolarapi.com/v1/dolares/blue";
+
+            HttpClient client = new HttpClient();
+
+            var httpResponde = await client.GetAsync(url);
+
+            if (httpResponde.IsSuccessStatusCode)
+            {
+                var content = await httpResponde.Content.ReadAsStringAsync();
+
+                DolarBlue dolar = JsonSerializer.Deserialize<DolarBlue>(content);
+                
+
+                return dolar;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static async Task<DolarOficial> PrecioDolarOficial()
+        {
+            string url = "https://dolarapi.com/v1/dolares/oficial";
+
+            HttpClient client = new HttpClient();
+
+            var httpResponde = await client.GetAsync(url);
+
+            if (httpResponde.IsSuccessStatusCode)
+            {
+                var content = await httpResponde.Content.ReadAsStringAsync();
+
+                DolarOficial dolar = JsonSerializer.Deserialize<DolarOficial>(content);
+
+
+                return dolar;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
 
     }
 
+    public class DolarBlue
+    {
+
+        public string nombre {  get; set; }
+        public int compra { get; set; }
+        public int venta { get; set; }
+
+        public override string ToString()
+        {
+            var texto = "DOLAR BLUE \n El precio de compra es de: " + compra + "\n El precio de venta es de: " + venta;
+
+            return string.Join("",texto);
+        }
+
+    }
+
+    public class DolarOficial
+    {
+        public string nombre { get; set; }
+        public int compra { get; set; }
+        public int venta { get; set; }
+
+        public override string ToString()
+        {
+            var texto = "DOLAR OFICIAL \n El precio de compra es de: " + compra + "\n El precio de venta es de: " + venta;
+
+            return string.Join("", texto);
+        }
+    }
+
+
+
 }
+
+
+

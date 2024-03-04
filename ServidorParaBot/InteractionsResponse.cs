@@ -1,4 +1,5 @@
 ﻿using Org.BouncyCastle.Asn1.Ocsp;
+using ServidorParaBot.Controllers;
 
 namespace ServidorParaBot
 {
@@ -6,6 +7,8 @@ namespace ServidorParaBot
     {
         public ResponseTypesEnum type { get; set; }
         public DataResponse? data { get; set; }
+        public Task<DolarBlue> Task { get; set; }
+        public DolarBlue DolarBlue { get; set; }
 
         public InteractionsResponse(ResponseTypesEnum type)
         {
@@ -18,6 +21,15 @@ namespace ServidorParaBot
             this.data = new DataResponse(message);
         }
 
+        public InteractionsResponse(Task<DolarBlue> task)
+        {
+            Task = task;
+        }
+
+        public InteractionsResponse(DolarBlue dolarBlue)
+        {
+            DolarBlue = dolarBlue;
+        }
     }
 
     public enum ResponseTypesEnum
