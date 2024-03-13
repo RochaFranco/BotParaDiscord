@@ -57,7 +57,24 @@ namespace ServidorParaBot.Controllers
                         {
                             var dolarBlue = await PrecioDolarBlue();
                             var dolarOficial = await PrecioDolarOficial();
-                            return Ok(new InteractionsResponse(dolarBlue.ToString() + "\n" + dolarOficial.ToString()));
+                            var dolarTarjeta = await PrecioDolarTarjeta();
+                            var dolarMep = await PrecioDolarMep();
+
+                            float[] dolares = {dolarOficial.compra,dolarOficial.venta,dolarBlue.compra,dolarBlue.venta,dolarTarjeta.compra,dolarTarjeta.venta,dolarMep.compra,dolarMep.venta};
+
+                            string text = ("```+---------+--------+-------+" +
+                                       "\r\n| DOLAR   | COMPRA | VENTA  |" +
+                                       "\r\n+---------+--------+--------+" +
+                                       "\r\n| OFICIAL |"+ $"{dolares[0],7}"+" |"+ $"{dolares[1],7}" + " |" +
+                                       "\r\n+---------+--------+--------+" +
+                                       "\r\n| BLUE    |"+ $"{dolares[2],7}"+" |"+ $"{dolares[3],7}" + " |" +
+                                       "\r\n+---------+--------+--------+" +
+                                       "\r\n| TARJETA |"+ $"{dolares[4],7}"+" |"+ $"{dolares[5],7}" + " |" +
+                                       "\r\n+---------+--------+--------+" +
+                                       "\r\n| MEP     |"+ $"{dolares[6],7}"+" |"+ $"{dolares[7],7}" + " |" +
+                                       "\r\n+---------+--------+--------+```");
+                            ;
+                            return Ok(new InteractionsResponse(text));
                         }
                     }
 
@@ -128,6 +145,52 @@ namespace ServidorParaBot.Controllers
             }
         }
 
+        public static async Task<DolarTarjeta> PrecioDolarTarjeta()
+        {
+            string url = "https://dolarapi.com/v1/dolares/tarjeta";
+
+            HttpClient client = new HttpClient();
+
+            var httpResponde = await client.GetAsync(url);
+
+            if (httpResponde.IsSuccessStatusCode)
+            {
+                var content = await httpResponde.Content.ReadAsStringAsync();
+
+                DolarTarjeta dolar = JsonSerializer.Deserialize<DolarTarjeta>(content);
+
+
+                return dolar;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static async Task<DolarMep> PrecioDolarMep()
+        {
+            string url = "https://dolarapi.com/v1/dolares/bolsa";
+
+            HttpClient client = new HttpClient();
+
+            var httpResponde = await client.GetAsync(url);
+
+            if (httpResponde.IsSuccessStatusCode)
+            {
+                var content = await httpResponde.Content.ReadAsStringAsync();
+
+                DolarMep dolar = JsonSerializer.Deserialize<DolarMep>(content);
+
+
+                return dolar;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
 
 
     }
@@ -136,8 +199,8 @@ namespace ServidorParaBot.Controllers
     {
 
         public string nombre {  get; set; }
-        public int compra { get; set; }
-        public int venta { get; set; }
+        public float compra { get; set; }
+        public float venta { get; set; }
 
         public override string ToString()
         {
@@ -151,8 +214,36 @@ namespace ServidorParaBot.Controllers
     public class DolarOficial
     {
         public string nombre { get; set; }
-        public int compra { get; set; }
-        public int venta { get; set; }
+        public float compra { get; set; }
+        public float venta { get; set; }
+
+        public override string ToString()
+        {
+            var texto = "DOLAR OFICIAL \n El precio de compra es de: " + compra + "\n El precio de venta es de: " + venta;
+
+            return string.Join("", texto);
+        }
+    }
+
+    public class DolarTarjeta
+    {
+        public string nombre { get; set; }
+        public float compra { get; set; }
+        public float venta { get; set; }
+
+        public override string ToString()
+        {
+            var texto = "DOLAR OFICIAL \n El precio de compra es de: " + compra + "\n El precio de venta es de: " + venta;
+
+            return string.Join("", texto);
+        }
+    }
+
+    public class DolarMep
+    {
+        public string nombre { get; set; }
+        public float compra { get; set; }
+        public float venta { get; set; }
 
         public override string ToString()
         {

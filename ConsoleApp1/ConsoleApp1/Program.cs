@@ -1,0 +1,2 @@
+﻿// See https://aka.ms/new-console-template for more information
+Console.WriteLine("+---------+--------+-------+\r\n| DOLAR   | COMPRA | VENTA |\r\n+---------+--------+-------+\r\n| OFICIAL |        |       |\r\n+---------+--------+-------+\r\n| BLUE    |        |       |\r\n+---------+--------+-------+\r\n| TARJETA |        |       |\r\n+---------+--------+-------+\r\n| MEP     |        |       |\r\n+---------+--------+-------+");
